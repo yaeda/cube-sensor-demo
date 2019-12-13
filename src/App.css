@@ -1,5 +1,13 @@
 .App {
   text-align: center;
+  background-color: #282c34;
+  color: white;
+
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0 10px;
 }
 
 .App-logo {
@@ -7,16 +15,81 @@
 }
 
 .App-header {
-  background-color: #282c34;
-  min-height: 100vh;
+  width: 100%;
   display: flex;
-  flex-direction: column;
   align-items: center;
+  flex-direction: column;
+  flex-grow: 1;
   justify-content: center;
   font-size: calc(10px + 2vmin);
-  color: white;
+}
+
+@keyframes bounce {
+  10%,
+  90% {
+    transform: translate3d(0, -2px, 0);
+  }
+
+  20%,
+  80% {
+    transform: translate3d(0, 4px, 0);
+  }
+
+  30%,
+  50%,
+  70% {
+    transform: translate3d(0, -8px, 0);
+  }
+
+  40%,
+  60% {
+    transform: translate3d(0, 8px, 0);
+  }
+}
+
+.App-header .bounce {
+  animation: bounce 0.82s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+  transform: translate3d(0, 0, 0);
+  backface-visibility: hidden;
+  perspective: 1000px;
+}
+
+.App-footer {
+  /* position: absolute; */
+  position: relative;
+  width: 100%;
+  bottom: 0;
+  padding: 1em 0;
+  opacity: 0.6;
+  font-size: calc(10px + 1vmin);
+}
+
+.App-footer p {
+  margin: 0.2em 0;
+}
+
+.App-notice {
+  margin: 1em 0;
+}
+
+.App-notice p {
+  margin: 0.2em 0;
 }
 
 .App-link {
-  color: #09d3ac;
+  color: inherit;
+}
+
+.App-button {
+  background-color: #00a3bc;
+  border: none;
+  color: white;
+  padding: 0.5em 1em;
+  border-radius: 10px;
+  font-size: calc(10px + 1.5vmin);
+  cursor: pointer;
+}
+
+.cube-view {
+  margin: 1em 0;
 }
