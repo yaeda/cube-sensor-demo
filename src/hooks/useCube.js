@@ -33,64 +33,46 @@ function useCube() {
   const [version, setVersion] = useState("");
   const cubeRef = useRef(null);
 
-  const connect = () => {
+  const connect = async () => {
     setConnected(false);
-    navigator.bluetooth
-      .requestDevice({
-        filters: [{ services: [SERVICE_UUID] }]
-      })
-      .then(device => {
-        cubeRef.current = device;
-        return device.gatt.connect();
-      })
-      .then(server => {
-        return server.getPrimaryService(SERVICE_UUID);
-      })
-      .then(service => {
-        return service.getCharacteristics();
-      })
-      .then(characteristics => {
-        characteristics.forEach(element => {
-          switch (element.uuid.toLowerCase()) {
-            case CHARACTERISTIC_SENSOR_UUID:
-              const charSensor = element;
-              charSensor.startNotifications();
-              charSensor.addEventListener(
-                "characteristicvaluechanged",
-                event => {
-                  const sensorInfo = getSensorInfo(event.target.value);
-                  if (sensorInfo != null) {
-                    setOrientation(sensorInfo.orientation);
-                    setDoubleTap(sensorInfo.doubleTap);
-                  }
-                }
-              );
-              charSensor.readValue().then(response => {
-                const sensorInfo = getSensorInfo(response);
-                if (sensorInfo != null) {
-                  setOrientation(sensorInfo.orientation);
-                  setDoubleTap(sensorInfo.doubleTap);
-                }
-              });
-              break;
-            case CHARACTERISTIC_CONFIG_UUID:
-              const charConfig = element;
-              charConfig.startNotifications();
-              charConfig.addEventListener(
-                "characteristicvaluechanged",
-                event => {
-                  const version = getBLEProtocolVersion(event.target.value);
-                  setVersion(version);
-                }
-              );
-              charConfig.writeValue(new Uint8Array([0x01, 0x00]));
-              break;
-            default:
-              break;
+    const device = await navigator.bluetooth.requestDevice({
+      filters: [{ services: [SERVICE_UUID] }]
+    });
+    cubeRef.current = device;
+    const server = await device.gatt.connect();
+    const service = await server.getPrimaryService(SERVICE_UUID);
+    const characteristics = await service.getCharacteristics();
+    for (const char of characteristics) {
+      switch (char.uuid.toLowerCase()) {
+        case CHARACTERISTIC_SENSOR_UUID:
+          await char.startNotifications();
+          char.addEventListener("characteristicvaluechanged", event => {
+            const sensorInfo = getSensorInfo(event.target.value);
+            if (sensorInfo != null) {
+              setOrientation(sensorInfo.orientation);
+              setDoubleTap(sensorInfo.doubleTap);
+            }
+          });
+          const response = await char.readValue();
+          const sensorInfo = getSensorInfo(response);
+          if (sensorInfo != null) {
+            setOrientation(sensorInfo.orientation);
+            setDoubleTap(sensorInfo.doubleTap);
           }
-        });
-        setConnected(true);
-      });
+          break;
+        case CHARACTERISTIC_CONFIG_UUID:
+          await char.startNotifications();
+          char.addEventListener("characteristicvaluechanged", event => {
+            const version = getBLEProtocolVersion(event.target.value);
+            setVersion(version);
+          });
+          char.writeValue(new Uint8Array([0x01, 0x00]));
+          break;
+        default:
+          break;
+      }
+    }
+    setConnected(true);
   };
 
   const disconnect = () => {
