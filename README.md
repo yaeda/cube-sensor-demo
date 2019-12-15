@@ -13,8 +13,7 @@ See also
 
 ## Trademark Notice
 
-"toio" is a registered trademark or trademark of Sony Interactiv
-e Entertainment Inc.
+"toio" is a registered trademark or trademark of Sony Interactive Entertainment Inc.
 
 ## License
 
